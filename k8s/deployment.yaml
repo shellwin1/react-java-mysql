@@ -18,7 +18,7 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 80
+      targetPort: 8080
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -37,13 +37,13 @@ spec:
     spec:
       containers:
         - name: backend
-          image: pihpoldevcrdockerxhub.azurecr.io/react-java-mysql-backend:latest
+          image: pihpoldevcrdocker2r6l.azurecr.io/react-java-mysql-backend:latest
           imagePullPolicy: Always
           env:
             - name: MYSQL_HOST
               value: db
           ports:
-            - containerPort: 80
+            - containerPort: 8080
           volumeMounts:
             - name: db-password
               mountPath: /run/secrets/db-password
@@ -51,12 +51,12 @@ spec:
               readOnly: true
           readinessProbe:
             httpGet:
-              port: healthcheck
+              port: 8080
               path: /actuator/health/readiness
             initialDelaySeconds: 10
           livenessProbe:
             httpGet:
-              port: healthcheck
+              port: 8080
               path: /actuator/health/liveness
             initialDelaySeconds: 60
             periodSeconds: 1
@@ -134,7 +134,7 @@ spec:
     app: phpmyadmin
   ports:
     - protocol: TCP
-      port: 8081
+      port: 80
       targetPort: 80
 ---
 apiVersion: apps/v1
@@ -160,6 +160,8 @@ spec:
           env:
             - name: PMA_HOST
               value: db
+            - name: PMA_ABSOLUTE_URI
+              value: http://20.215.98.9/phpmyadmin/
 ---
 apiVersion: v1
 kind: Service
@@ -171,8 +173,8 @@ spec:
     app: frontend
   ports:
     - protocol: TCP
-      port: 3000
-      targetPort: 3000
+      port: 80
+      targetPort: 80
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -191,18 +193,52 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: pihpoldevcrdockerxhub.azurecr.io/react-java-mysql-frontend:latest
+          image: pihpoldevcrdocker2r6l.azurecr.io/react-java-mysql-frontend:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 3000
+            - containerPort: 80
           readinessProbe:
             httpGet:
               path: /
-              port: 3000
+              port: 80
           livenessProbe:
             httpGet:
               path: /
-              port: 3000
+              port: 80
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pih-app-ingress
+  namespace: pih-app
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: webapprouting.kubernetes.azure.com
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+          - path: /api
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 80
+          - path: /phpmyadmin
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: phpmyadmin
+                port:
+                  number: 80

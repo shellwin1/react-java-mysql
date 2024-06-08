@@ -97,16 +97,16 @@ Build applications and push to container registry
 
 ### backend
 ```
-$ az acr login --name pihpoldevcrdockerxhub
+$ az acr login --name pihpoldevcrdocker2r6l
 $ cd backend
-$ docker build -t pihpoldevcrdockerxhub.azurecr.io/react-java-mysql-backend:latest .
-$ docker push pihpoldevcrdockerxhub.azurecr.io/react-java-mysql-backend:latest
+$ docker build -t pihpoldevcrdocker2r6l.azurecr.io/react-java-mysql-backend:latest .
+$ docker push pihpoldevcrdocker2r6l.azurecr.io/react-java-mysql-backend:latest
 ```
 ### frontend
 ```
 $ cd frontend
-$ docker build -t pihpoldevcrdockerxhub.azurecr.io/react-java-mysql-frontend:latest .
-$ docker push pihpoldevcrdockerxhub.azurecr.io/react-java-mysql-frontend:latest
+$ docker build -t pihpoldevcrdocker2r6l.azurecr.io/react-java-mysql-frontend:latest .
+$ docker push pihpoldevcrdocker2r6l.azurecr.io/react-java-mysql-frontend:latest
 ```
 Deploy to kubernetes
 
